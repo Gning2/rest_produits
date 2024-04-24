@@ -135,7 +135,7 @@ app.delete('/produits/:_id', (req, res) => {
     });
 });
 
-//Démarrer le serveur
+
 app.listen(port,
     console.log(`Server running at http://localhost:${port}`)
 )
