@@ -1,8 +1,9 @@
-require('dotenv').config();
-import { get } from 'axios';
-import express, { json } from 'express';
-import { connect as _connect, Types } from 'mongoose';
-import Produit  from './models/Produit';
+import dotenv from 'dotenv'
+dotenv.config()
+import axios from 'axios';
+import express from 'express';
+import mongoose from 'mongoose'
+import Produit from './models/Produit.js'
 const app = express();
 const port = 5000;
 
@@ -10,7 +11,7 @@ const port = 5000;
 const url = process.env.MONGO_URL;
 function connect(){
     try{
-        _connect(url, {
+        mongoose.connect(url, {
             useNewUrlParser: true,
             useUnifiedTopology: true
         });
@@ -23,7 +24,7 @@ function connect(){
 connect();
 
 
-app.use(json());
+app.use(express.json());
 
 
 // URL de l'API Mock.io pour récupérer les données de produits
@@ -34,7 +35,7 @@ const mockApiUrl = 'https://6606d9f9be53febb857ec4eb.mockapi.io/api/v1/products'
 async function fetchAndSaveProducts() {
     try {
     // Récupérer les données de produits depuis Mock.io
-    const response = await get(mockApiUrl);
+    const response = await axios.get(mockApiUrl);
     const productsData = response.data;
 
     // Transformer les données en instances de modèle Mongoose et les sauvegarder dans la base de données
@@ -61,7 +62,7 @@ fetchAndSaveProducts();
 
 //Route get pour récupérer tous les produits
 app.get('/produits', (req, res) => {
-    find()
+    Produit.find()
     .then((produits) => {
         res.json(produits);
     })
@@ -72,7 +73,7 @@ app.get('/produits', (req, res) => {
 
 //Route get pour récupérer un produit par son ID
 app.get('/produits/:_id', (req, res) => {
-    findById(req.params._id)
+    Produit.findById(req.params._id)
     .then((produit) => {
         if (produit) {
             res.json(produit);
@@ -88,7 +89,7 @@ app.get('/produits/:_id', (req, res) => {
 //Route post pour ajouter un produit
 app.post('/produits', (req, res) => {
     const produit = new Produit({
-        _id: new Types.ObjectId(),
+        _id: new mongoose.Types.ObjectId(),
         createdAt: req.body.createdAt,
         name: req.body.name,
         details: req.body.details,
@@ -106,7 +107,7 @@ app.post('/produits', (req, res) => {
 
 // Route PUT pour modifier un produit par son ID
 app.put('/produits/:_id', (req, res) => {
-    findByIdAndUpdate(req.params._id, req.body)
+    Produit.findByIdAndUpdate(req.params._id, req.body)
     .then((produit) => {
         if (produit) {
             res.json(produit);
@@ -121,7 +122,7 @@ app.put('/produits/:_id', (req, res) => {
 
 // Route DELETE pour supprimer un produit par son ID
 app.delete('/produits/:_id', (req, res) => {
-    findByIdAndDelete(req.params._id)
+    Produit.findByIdAndDelete(req.params._id)
     .then((produit) => {
         if (produit) {
             res.json(produit);
